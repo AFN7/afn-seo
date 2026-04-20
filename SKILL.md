@@ -247,6 +247,126 @@ Note to user — these can't be fixed in code:
 - Request Indexing used for new priority pages
 - Inspect GSC "Pages" report for specific rejection reasons
 
+### S. Mobile-First Indexing (Google indexes the mobile version)
+
+- [ ] Content parity between mobile and desktop (hidden content on mobile = not indexed)
+- [ ] Structured data present on mobile variant, not only desktop
+- [ ] Internal links identical on mobile (no nav items hidden behind hamburger that aren't in the HTML)
+- [ ] Tap targets ≥ 48px with sufficient spacing
+- [ ] Base font size ≥ 16px (no pinch-to-zoom required)
+- [ ] No horizontal scroll at common mobile widths (360px, 375px, 414px)
+- [ ] Images scale responsively (max-width: 100%)
+- [ ] No separate `m.` subdomain without proper `rel=alternate`/`rel=canonical` pairing
+
+### T. JavaScript Rendering & Googlebot Parity
+
+- [ ] Critical content (title, description, h1, main body, links) visible in **initial HTML**, not only after JS execution
+- [ ] Test with JS disabled: does SEO-critical content render?
+- [ ] `curl -A "Googlebot" <url>` returns the same core content as browser view
+- [ ] Client-side routing uses real `<a href>` tags, not JS-only `onClick` handlers
+- [ ] No "Loading..." placeholder text appearing in Google cache / indexed result
+- [ ] SSR/SSG for content pages; CSR acceptable only for authed/interactive app sections
+- [ ] Hydration errors don't strip metadata (check console on production)
+- [ ] `robots.txt` does NOT block critical JS/CSS (Googlebot needs them to render)
+
+### U. Hreflang & Internationalization (deep)
+
+- [ ] `hreflang` with `x-default` pointing to the default/language-selector page
+- [ ] **Return tags** — if page A links to B via hreflang, B must link back to A
+- [ ] ISO codes valid (`en-US`, `tr-TR`, not `uk` for UK, not `en-UK`)
+- [ ] Self-referencing hreflang on every variant
+- [ ] Currency, date format, and locale consistent with the language version
+- [ ] Each language variant has its own canonical (not cross-canonicalized to master)
+- [ ] Hreflang in `<head>`, HTTP header, or sitemap — pick one, stay consistent
+- [ ] No auto-redirect based on IP/Accept-Language (blocks Googlebot from seeing other variants)
+
+### V. E-E-A-T Signals (Experience, Expertise, Authoritativeness, Trustworthiness)
+
+- [ ] Author bio pages exist with real `Person` schema (`name`, `url`, `sameAs`)
+- [ ] `/about` and `/contact` pages exist with real business info
+- [ ] `/privacy` and `/terms` linked from footer
+- [ ] `datePublished` and `dateModified` visible to users (not only in schema)
+- [ ] Outbound citations to authoritative sources present where claims are made
+- [ ] Business details (NAP) consistent site-wide and match external directories
+- [ ] No AI-generated author names / fake bylines (Google flags these)
+
+### W. Security & Page Experience Headers (ranking signals + crawl trust)
+
+- [ ] **HSTS** header set (`Strict-Transport-Security: max-age=31536000; includeSubDomains; preload`)
+- [ ] `X-Content-Type-Options: nosniff`
+- [ ] `Referrer-Policy` sensible (e.g. `strict-origin-when-cross-origin`)
+- [ ] CSP header present (doesn't block critical SEO resources)
+- [ ] No intrusive interstitials on mobile (modals covering content = Google penalty)
+- [ ] Safe Browsing clean (check GSC "Security issues")
+- [ ] No `upgrade-insecure-requests` bypasses mixed content properly
+
+### X. Caching & Compression (affects crawl efficiency)
+
+- [ ] `Cache-Control` set on static assets with long `max-age` (images, CSS, JS)
+- [ ] `ETag` or `Last-Modified` on HTML so Googlebot can use `If-Modified-Since`
+- [ ] Server returns `304 Not Modified` when content unchanged
+- [ ] gzip or brotli compression enabled (check `Content-Encoding` header)
+- [ ] HTTP/2 or HTTP/3 enabled (modern transport improves crawl throughput)
+- [ ] No unnecessary `Cache-Control: no-store` on public HTML
+
+### Y. Crawl Budget Waste / Traps
+
+- [ ] Infinite calendar URLs (e.g. `/events/2098/01`) limited or `noindex`ed
+- [ ] Session IDs stripped from URLs (`?sessionid=...`) or canonical set to base
+- [ ] Pagination beyond content (page 5000 of 10 results) — 404 or redirect
+- [ ] UTM/tracking params canonicalized to clean URL
+- [ ] Internal search result pages (`/search?q=...`) set to `noindex`
+- [ ] Print/email/amp variants consolidated with canonical
+- [ ] Parameter handling configured in GSC if site uses heavy parameters
+
+### Z. Specialty Content Checks
+
+**E-commerce (Product pages):**
+- [ ] `Product` schema with full `offers` (price, priceCurrency, availability, url, priceValidUntil)
+- [ ] `AggregateRating` only if real reviews exist (`ratingCount` or `reviewCount` required)
+- [ ] `Brand`, `sku`, `mpn`, `gtin` populated where available
+- [ ] Stock status accurate (`InStock`, `OutOfStock`, `PreOrder`)
+- [ ] Variant pages canonical to main product OR genuinely unique content per variant
+- [ ] Merchant Center feed matches on-site data (note to user if using Google Shopping)
+
+**News / Blog:**
+- [ ] `NewsArticle` / `Article` / `BlogPosting` schema with required fields
+- [ ] `datePublished` visible to users, not only in schema
+- [ ] Author linked to dedicated author page with `Person` schema
+- [ ] `news-sitemap.xml` if applying for Google News
+- [ ] `max-image-preview:large` robots directive for rich news snippets
+- [ ] Article body in `<article>` landmark
+
+**Video:**
+- [ ] `VideoObject` schema (`name`, `description`, `thumbnailUrl`, `uploadDate`, `contentUrl` or `embedUrl`, `duration` in ISO 8601)
+- [ ] Video sitemap if site has many videos
+- [ ] Transcript on page (improves indexing + accessibility)
+- [ ] Thumbnails follow Google guidelines (160x90 to 1920x1080, 16:9 ideal)
+
+**Local Business:**
+- [ ] `LocalBusiness` schema with real `address`, `telephone`, `openingHoursSpecification`, `geo`
+- [ ] NAP (Name/Address/Phone) consistent across site and external directories
+- [ ] Google Business Profile claimed (note to user — not a code check)
+- [ ] Per-location pages with unique content (not duplicated city pages)
+
+### AA. Favicon & Site Identity
+
+- [ ] `/favicon.ico` returns 200 (root-level, not only linked in HTML)
+- [ ] `<link rel="icon">` present with modern formats (SVG preferred, 32x32 PNG fallback)
+- [ ] `<link rel="apple-touch-icon">` at 180x180
+- [ ] Favicon ≥ 48x48 and crawlable (Google requires this for SERP display)
+- [ ] Logo referenced in `Organization` schema `logo` field
+- [ ] `manifest.json` has proper icons array for PWA
+
+### AB. Rendered HTML vs Source HTML Audit
+
+- [ ] Compare `curl <url>` output to browser-rendered DOM for critical content parity
+- [ ] Verify Googlebot can fetch critical CSS/JS (not blocked by robots.txt or CORS)
+- [ ] No `display:none` hiding SEO-critical content (Google deprioritizes)
+- [ ] No user-agent-conditional content (cloaking = manual action)
+- [ ] No WAF/Cloudflare bot challenge blocking Googlebot (verify with GSC URL Inspection)
+- [ ] Check Google's rendered view via GSC "URL Inspection" → "View crawled page"
+
 ---
 
 ## Phase 3: Report Format
